@@ -20,3 +20,8 @@ It generates a folder comes with a index.html file at the path of you provided, 
 2. install discord.py
 3. setup the nginx or apache web server
 4. fill in the token, URL and file path
+5. run bot.py
+
+# Note
+
+The index.html is provided in the file. You can use it as the "/" page.
