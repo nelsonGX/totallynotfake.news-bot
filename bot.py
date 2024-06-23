@@ -11,6 +11,7 @@ client = discord.Client(intents=discord.Intents.all())
 
 file_path = "./www"
 website_url = "https://totallynotfake.news"
+discord_token = "TOKEN"
 
 ############################################################
 
@@ -201,4 +202,4 @@ html_3 = '''
 '''
 
 
-client.run("TOKEN")
+client.run(discord_token)
