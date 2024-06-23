@@ -1,8 +1,18 @@
 import discord
 import re
 import os
+import time
 
 client = discord.Client(intents=discord.Intents.all())
+
+############################################################
+
+# settings
+
+file_path = "./www"
+website_url = "https://totallynotfake.news"
+
+############################################################
 
 def convert_text(text):
     text = re.sub(r'^# (.+)$', r'<h1>\1</h1>', text, flags=re.MULTILINE)
@@ -11,6 +21,9 @@ def convert_text(text):
     text = text.replace('\n', '<br/>')
     
     return text
+
+def generate_news_path():
+    return f"news/{str(int(time.time()))}.html"
 
 @client.event
 async def on_ready():
@@ -22,10 +35,18 @@ async def on_message(message):
         return
     
     if message.content.startswith(f'<@{str(client.user.id)}>'):
-        command = message.content.split(' ')[1]
+        news_path = generate_news_path()
+        command = message.content.split(' ')[1].split('\n')[0]
+        print(command)
         if command == "upload":
+            print("test")
             content = convert_text(re.sub(f"<@{str(client.user.id)}> upload\n","",message.content))
-
+            if not os.path.exists(file_path):
+                os.makedirs(file_path)
+            os.makedirs(f"{file_path}/{news_path}")
+            with open(f"{file_path}/{news_path}/index.html", "w", encoding="utf-8") as f:
+                f.write(meta_1 + content + meta_2)
+            await message.reply(f"網站已經上傳，請前往 {website_url}/{news_path} 查看")
 
 meta_1 = '''
 <!DOCTYPE html>
@@ -126,10 +147,10 @@ meta_1 = '''
             </div>
             <nav>
                 <ul>
-                    <li class="current"><a href="index.html">熱門</a></li>
-                    <li><a href="politics.html">不熱門</a></li>
-                    <li><a href="technology.html">很熱門</a></li>
-                    <li><a href="sports.html">很熱</a></li>
+                    <li class="current"><a href="#">熱門</a></li>
+                    <li><a href="#">不熱門</a></li>
+                    <li><a href="#">很熱門</a></li>
+                    <li><a href="https://github.com/nelsonGX/totallynotfake.news-bot">GitHub</a></li>
                 </ul>
             </nav>
         </div>
@@ -166,3 +187,6 @@ meta_2 = '''
 </body>
 </html>
 '''
+
+
+client.run("TOKEN")
