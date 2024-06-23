@@ -23,7 +23,7 @@ def convert_text(text):
     return text
 
 def generate_news_path():
-    return f"news/{str(int(time.time()))}.html"
+    return f"news/{str(int(time.time()))}"
 
 @client.event
 async def on_ready():
@@ -42,8 +42,9 @@ async def on_message(message):
             first_title = re.search(r'^# (.+)$', message.content, flags=re.MULTILINE)
             first_title = first_title.group(1) if first_title else "新聞"
             meta_title = first_title
+            content = convert_text(re.sub(f"<@{str(client.user.id)}> upload\n","",message.content))
 
-            meta_desc = re.search(r'^# (.+)$', re.sub(f"^# {first_title}\n","",message.content), flags=re.MULTILINE)[:50] + "..."
+            meta_desc = re.sub(meta_title, "", content)[:50] + "..."
             
             html_1 = f'''
                 <!DOCTYPE html>
@@ -51,12 +52,11 @@ async def on_message(message):
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta name="title" content={meta_title} />
-                    <meta name="description" content={meta_desc} />
+                    <meta name="title" content="{meta_title}" />
+                    <meta name="description" content="{meta_desc}" />
                     <title>絕對不是假新聞網</title>
                 '''
 
-            content = convert_text(re.sub(f"<@{str(client.user.id)}> upload\n","",message.content))
             if not os.path.exists(file_path):
                 os.makedirs(file_path)
             os.makedirs(f"{file_path}/{news_path}")
@@ -129,7 +129,7 @@ html_2 = '''
         #main h1 {
             font-size: 45px;
         }
-        #main p {
+        #main {
             margin-bottom: 20px;
             font-size: 20px;
         }
