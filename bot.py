@@ -39,22 +39,34 @@ async def on_message(message):
         command = message.content.split(' ')[1].split('\n')[0]
         print(command)
         if command == "upload":
-            print("test")
+            first_title = re.search(r'^# (.+)$', message.content, flags=re.MULTILINE)
+            first_title = first_title.group(1) if first_title else "新聞"
+            meta_title = first_title
+
+            meta_desc = re.search(r'^# (.+)$', re.sub(f"^# {first_title}\n","",message.content), flags=re.MULTILINE)[:50] + "..."
+            
+            html_1 = f'''
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta name="title" content={meta_title} />
+                    <meta name="description" content={meta_desc} />
+                    <title>絕對不是假新聞網</title>
+                '''
+
             content = convert_text(re.sub(f"<@{str(client.user.id)}> upload\n","",message.content))
             if not os.path.exists(file_path):
                 os.makedirs(file_path)
             os.makedirs(f"{file_path}/{news_path}")
             with open(f"{file_path}/{news_path}/index.html", "w", encoding="utf-8") as f:
-                f.write(meta_1 + content + meta_2)
+                f.write(html_1 + html_2 + content + html_3)
             await message.reply(f"網站已經上傳，請前往 {website_url}/{news_path} 查看")
 
-meta_1 = '''
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>絕對不是假新聞網</title>
+
+
+html_2 = '''
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -168,7 +180,7 @@ meta_1 = '''
             <article id="main-col">
 '''
 
-meta_2 = '''
+html_3 = '''
             </article>
             <aside id="sidebar">
                 <h3>今日頭條</h3>
