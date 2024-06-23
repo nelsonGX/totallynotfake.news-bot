@@ -10,7 +10,7 @@ result: https://totallynotfake.news/news/1719162488/
 
 # How it works
 
-It generates a folder comes with a index.html file at the path of you provided, with insalling of nginx or apache, it allows others to view the page.
+It generates a folder comes with a index.html file at the path of you provided, with installing of nginx or apache, it allows others to view the page.
 
 ![1719174655182](image/README/1719174655182.png)
 
