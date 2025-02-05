@@ -12,6 +12,7 @@ client = discord.Client(intents=discord.Intents.all())
 file_path = "./www"
 website_url = "https://totallynotfake.news"
 discord_token = "TOKEN"
+allowed_image_formats = ["jpg", "jpeg", "png", "gif", "webp"]
 
 ############################################################
 
@@ -43,7 +44,18 @@ async def on_message(message):
             first_title = re.search(r'^# (.+)$', message.content, flags=re.MULTILINE)
             first_title = first_title.group(1) if first_title else "新聞"
             meta_title = first_title
-            content = convert_text(re.sub(f"<@{str(client.user.id)}> upload\n","",message.content))
+            content = convert_text(re.sub(f"<@{str(client.user.id)}> upload\n", "", message.content))
+
+            image_html = ""
+            news_folder = f"{file_path}/{news_path}"
+            if not os.path.exists(news_folder):
+                os.makedirs(news_folder)
+
+            for attachment in message.attachments:
+                if any(attachment.filename.lower().endswith(ext) for ext in allowed_image_formats):
+                    image_path = f"{news_folder}/{attachment.filename}"
+                    await attachment.save(image_path)
+                    image_html += f'<img src="{website_url}/{news_path}/{attachment.filename}" alt="{attachment.filename}" style="max-width: 100%; max-height: 500px;"><br/>'
 
             meta_desc = re.sub(meta_title, "", content)[:50] + "..."
             
@@ -57,12 +69,11 @@ async def on_message(message):
                     <meta name="description" content="{meta_desc}" />
                     <title>絕對不是假新聞網</title>
                 '''
-
             if not os.path.exists(file_path):
                 os.makedirs(file_path)
-            os.makedirs(f"{file_path}/{news_path}")
-            with open(f"{file_path}/{news_path}/index.html", "w", encoding="utf-8") as f:
-                f.write(html_1 + html_2 + content + html_3)
+
+            with open(f"{news_folder}/index.html", "w", encoding="utf-8") as f:
+                f.write(html_1 + html_2 + image_html + content + html_3)
             await message.reply(f"網站已經上傳，請前往 {website_url}/{news_path} 查看")
 
 
